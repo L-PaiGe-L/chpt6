@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matplotlib 坐标轴定制练习 - 粉紫主题</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f8bbd9 0%, #e1bee7 50%, #ce93d8 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #d81b60 0%, #8e24aa 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(142, 36, 170, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header h2 {
+            font-size: 1.5em;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .exercise {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 15px;
+            border-left: 6px solid #d81b60;
+            box-shadow: 0 5px 20px rgba(142, 36, 170, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .exercise-title {
+            color: #8e24aa;
+            margin-top: 0;
+            font-size: 1.8em;
+            border-bottom: 2px solid #f8bbd9;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .task {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #e1bee7;
+        }
+        
+        .task h3 {
+            color: #d81b60;
+            margin-bottom: 15px;
+        }
+        
+        .requirements {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #d81b60;
+            margin: 15px 0;
+        }
+        
+        .requirements ul {
+            padding-left: 20px;
+        }
+        
+        .requirements li {
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+        
+        .data-section {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #d81b60;
+            margin: 15px 0;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(142, 36, 170, 0.2);
+            border: 1px solid #e1bee7;
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #8e24aa;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #d81b60;
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8bbd9 0%, #e1bee7 100%);
+            border-radius: 15px;
+            color: #7b1fa2;
+            box-shadow: 0 5px 20px rgba(142, 36, 170, 0.2);
+        }
+        
+        .loading {
+            text-align: center;
+            color: #8e24aa;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        
+        .nav-button {
+            flex: 1;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #d81b60 0%, #8e24aa 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(142, 36, 170, 0.4);
+        }
+        
+        .exercise-number {
+            background: #d81b60;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>第6章: Matplotlib 坐标轴定制练习题</h1>
+        <h2>熟练掌握 Matplotlib 坐标轴定制核心技巧</h2>
+        <p>包括刻度控制、图内轴添加、轴脊调整，提升图表专业性</p>
+    </div>
+
+    <!-- 练习 1 -->
+    <div class="exercise" id="exercise1">
+        <div class="exercise-number">练习 1</div>
+        <h2 class="exercise-title">定制刻度位置、格式与样式</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>用给定的 48 小时股票价格数据，绘制折线图(样式 'g-o')，重点实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>X 轴主刻度每 12 小时、格式为 YYYY-MM-DD HH:MM</li>
+                    <li>X 轴次刻度每 2 小时</li>
+                    <li>主刻度朝外(蓝色、长10宽2、标签旋转15°)，次刻度朝内(红色、长5)</li>
+                    <li>添加网格线，设置合理标题和轴标签</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+base = datetime(2025, 1, 1, 0)
+x_time = np.array([base + timedelta(hours=i*2) for i in range(25)])
+y_price = np.array([100.0, 100.2, 101.0, 100.5, 100.8, 102.0, 101.5, 101.8,
+                  101.3, 100.9, 100.0, 99.5, 100.0, 99.8, 100.5, 101.2, 101.0, 101.5, 102.5,
+                  103.0, 102.8, 102.5, 102.0, 101.5, 101.8])
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">股票价格走势图</div>
+            <div class="loading">正在生成图表...</div>
+            <canvas id="chart1" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <!-- 练习 2 -->
+    <div class="exercise" id="exercise2">
+        <div class="exercise-number">练习 2</div>
+        <h2 class="exercise-title">添加图内坐标轴</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>用"大图+小图"展示销量数据:</p>
+            <div class="requirements">
+                <ul>
+                    <li>大图(主坐标轴)展示全国总销量(样式 'b-s')</li>
+                    <li>小图(嵌入右上角)展示华东区销量(样式 'r-o')</li>
+                    <li>主坐标轴位置 [0.1, 0.1, 0.8, 0.8]，小图位置自己调节</li>
+                    <li>小图刻度标签缩小，避免拥挤(可取 labelsize=8)</li>
+                    <li>设置标题、轴标签和图例</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+x_all = np.arange(1, 13)
+y_all_sales = np.array([50, 55, 60, 65, 75, 80, 85, 90, 80, 70, 65, 70])
+y_east_sales = np.array([20, 22, 25, 28, 30, 35, 38, 40, 35, 30, 28, 30])
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">全国及华东区销量月度走势图</div>
+            <div class="loading">正在生成图表...</div>
+            <canvas id="chart2" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <!-- 练习 3 -->
+    <div class="exercise" id="exercise3">
+        <div class="exercise-number">练习 3</div>
+        <h2 class="exercise-title">隐藏部分轴脊</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>用水平条形图展示编程语言投票数据，重点实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>隐藏顶部和右侧轴脊</li>
+                    <li>隐藏 Y 轴刻度线</li>
+                    <li>(选做)为条形图添加得票数值标签</li>
+                    <li>设置标题和轴标签，优化图表简洁度</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+languages = ['Python', 'JavaScript', 'Java', 'C#', 'Go', 'TypeScript']
+y_pos = np.arange(len(languages))
+votes = np.array([450, 380, 290, 180, 120, 90])
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">编程语言投票结果条形图</div>
+            <div class="loading">正在生成图表...</div>
+            <canvas id="chart3" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <!-- 练习 4 -->
+    <div class="exercise" id="exercise4">
+        <div class="exercise-number">练习 4</div>
+        <h2 class="exercise-title">移动轴脊到数据中心</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>绘制二次函数 y = x²，重点实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>隐藏顶部和右侧轴脊</li>
+                    <li>将左右、底部轴脊移动到坐标原点 (0,0)</li>
+                    <li>设置合理坐标轴范围，添加图例和标题</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+x = np.linspace(-5, 5, 100)
+y = x**2
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">二次函数图像</div>
+            <div class="loading">正在生成图表...</div>
+            <canvas id="chart4" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <!-- 练习 5 -->
+    <div class="exercise" id="exercise5">
+        <div class="exercise-number">练习 5</div>
+        <h2 class="exercise-title">综合定制(轴脊+刻度)</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>绘制正切函数 y = tan(x)，综合实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>隐藏顶部和右侧轴脊，移动轴脊到原点</li>
+                    <li>Y 轴范围限制为 [-4, 4](避开无穷大奇点)</li>
+                    <li>X 轴刻度设为 [-π, -π/2, 0, π/2, π]，标签用 LaTeX 格式</li>
+                    <li>添加网格线、图例和标题</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+x = np.linspace(-np.pi + 0.1, np.pi - 0.1, 200)
+y = np.tan(x)
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">正切函数图像</div>
+            <div class="loading">正在生成图表...</div>
+            <canvas id="chart5" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-button" onclick="scrollToTop()">回到顶部</button>
+        <button class="nav-button" onclick="generateAllCharts()">重新生成所有图表</button>
+    </div>
+
+    <div class="instructions">
+        <h3>✨ 图表展示说明</h3>
+        <p>所有图表使用原生Canvas绘制，支持离线查看</p>
+        <p>统一使用粉紫色调，色彩协调美观</p>
+    </div>
+
+    <script>
+        // 粉紫色调配色方案
+        const colorScheme = {
+            primary: '#8e24aa',     // 主紫色
+            secondary: '#d81b60',   // 粉红色
+            accent: '#e1bee7',       // 浅紫色
+            background: '#f8bbd9',   // 粉紫色背景
+            light: '#fce4ec',        // 浅粉色
+            dark: '#7b1fa2'          // 深紫色
+        };
+
+        // 练习1：股票价格图
+        function createChart1() {
+            const canvas = document.getElementById('chart1');
+            const ctx = canvas.getContext('2d');
+            
+            // 数据
+            const prices = [100.0, 100.2, 101.0, 100.5, 100.8, 102.0, 101.5, 101.8,
+                          101.3, 100.9, 100.0, 99.5, 100.0, 99.8, 100.5, 101.2, 
+                          101.0, 101.5, 102.5, 103.0, 102.8, 102.5, 102.0, 101.5, 101.8];
+            
+            // 绘制图表
+            drawLineChart(ctx, canvas.width, canvas.height, prices, '股票价格走势图', '时间(小时)', '价格(元)', colorScheme.primary);
+        }
+
+        // 练习2：销量图
+        function createChart2() {
+            const canvas = document.getElementById('chart2');
+            const ctx = canvas.getContext('2d');
+            
+            // 数据
+            const allSales = [50, 55, 60, 65, 75, 80, 85, 90, 80, 70, 65, 70];
+            const eastSales = [20, 22, 25, 28, 30, 35, 38, 40, 35, 30, 28, 30];
+            
+            // 绘制双线图
+            drawMultiLineChart(ctx, canvas.width, canvas.height, [allSales, eastSales], 
+                            ['全国总销量', '华东区销量'], '全国及华东区销量月度走势图', '月份', '销量(万件)', 
+                            [colorScheme.primary, colorScheme.secondary]);
+        }
+
+        // 练习3：条形图
+        function createChart3() {
+            const canvas = document.getElementById('chart3');
+            const ctx = canvas.getContext('2d');
+            
+            // 数据
+            const languages = ['Python', 'JavaScript', 'Java', 'C#', 'Go', 'TypeScript'];
+            const votes = [450, 380, 290, 180, 120, 90];
+            
+            // 绘制水平条形图
+            drawBarChart(ctx, canvas.width, canvas.height, languages, votes, '编程语言投票结果条形图', '得票数', colorScheme.primary);
+        }
+
+        // 练习4：二次函数
+        function createChart4() {
+            const canvas = document.getElementById('chart4');
+            const ctx = canvas.getContext('2d');
+            
+            // 生成函数数据
+            const xValues = [];
+            const yValues = [];
+            for (let i = -5; i <= 5; i += 0.1) {
+                xValues.push(i);
+                yValues.push(i * i);
+            }
+            
+            // 绘制函数图像
+            drawFunctionChart(ctx, canvas.width, canvas.height, xValues, yValues, '二次函数 y = x² 图像', 'x', 'y', colorScheme.secondary);
+        }
+
+        // 练习5：正切函数
+        function createChart5() {
+            const canvas = document.getElementById('chart5');
+            const ctx = canvas.getContext('2d');
+            
+            // 生成函数数据（避开奇点）
+            const xValues = [];
+            const yValues = [];
+            const pi = Math.PI;
+            for (let i = -pi + 0.1; i <= pi - 0.1; i += 0.05) {
+                if (Math.abs(i) !== pi/2) {
+                    xValues.push(i);
+                    yValues.push(Math.tan(i));
+                }
+            }
+            
+            // 绘制函数图像
+            drawFunctionChart(ctx, canvas.width, canvas.height, xValues, yValues, '正切函数 y = tan(x) 图像', 'x', 'y', colorScheme.primary);
+        }
+
+        // 绘制折线图
+        function drawLineChart(ctx, width, height, data, title, xLabel, yLabel, color) {
+            ctx.clearRect(0, 0, width, height);
+            
+            const padding = 60;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+            
+            // 绘制背景
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 绘制标题
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            // 绘制坐标系
+            ctx.strokeStyle = colorScheme.accent;
+            ctx.lineWidth = 1;
+            
+            // 绘制数据线
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            data.forEach((value, i) => {
+                const x = padding + (chartWidth * i) / (data.length - 1);
+                const y = height - padding - (chartHeight * (value - Math.min(...data))) / (Math.max(...data) - Math.min(...data));
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // 绘制数据点
+            data.forEach((value, i) => {
+                const x = padding + (chartWidth * i) / (data.length - 1);
+                const y = height - padding - (chartHeight * (value - Math.min(...data))) / (Math.max(...data) - Math.min(...data));
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+        }
+
+        // 绘制双线图
+        function drawMultiLineChart(ctx, width, height, datasets, labels, title, xLabel, yLabel, colors) {
+            ctx.clearRect(0, 0, width, height);
+            
+            const padding = 60;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+            
+            // 绘制背景
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 绘制标题
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            // 绘制每条数据线
+            datasets.forEach((data, index) => {
+                ctx.strokeStyle = colors[index];
+                ctx.fillStyle = colors[index];
+                ctx.lineWidth = 3;
+                
+                ctx.beginPath();
+                data.forEach((value, i) => {
+                    const x = padding + (chartWidth * i) / (data.length - 1);
+                    const y = height - padding - (chartHeight * (value - Math.min(...data))) / (Math.max(...data) - Math.min(...data));
+                    
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                ctx.stroke();
+                
+                // 绘制数据点
+                data.forEach((value, i) => {
+                    const x = padding + (chartWidth * i) / (data.length - 1);
+                    const y = height - padding - (chartHeight * (value - Math.min(...data))) / (Math.max(...data) - Math.min(...data));
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+            });
+        }
+
+        // 绘制条形图
+        function drawBarChart(ctx, width, height, labels, values, title, xLabel, color) {
+            ctx.clearRect(0, 0, width, height);
+            
+            const padding = 80;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+            
+            // 绘制背景
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 绘制标题
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            const barWidth = chartWidth / labels.length * 0.8;
+            const barSpacing = chartWidth / labels.length * 0.2;
+            const maxValue = Math.max(...values);
+            
+            labels.forEach((label, i) => {
+                const barHeight = (values[i] / maxValue) * chartHeight;
+                const x = padding + i * (barWidth + barSpacing);
+                const y = height - padding - barHeight;
+                
+                // 绘制条形
+                ctx.fillStyle = color;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // 绘制数值标签
+                ctx.fillStyle = colorScheme.dark;
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(values[i], x + barWidth / 2, y - 5);
+                
+                // 绘制标签
+                ctx.fillStyle = colorScheme.dark;
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(label, x + barWidth / 2, height - padding + 20);
+            });
+        }
+
+        // 绘制函数图像
+        function drawFunctionChart(ctx, width, height, xValues, yValues, title, xLabel, yLabel, color) {
+            ctx.clearRect(0, 0, width, height);
+            
+            const padding = 60;
+            const chartWidth = width - 2 * padding;
+            const chartHeight = height - 2 * padding;
+            
+            // 绘制背景
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 绘制标题
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            // 绘制函数曲线
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            xValues.forEach((x, i) => {
+                const canvasX = padding + (chartWidth * (x - Math.min(...xValues))) / (Math.max(...xValues) - Math.min(...xValues));
+                const canvasY = height - padding - (chartHeight * (yValues[i] - Math.min(...yValues))) / (Math.max(...yValues) - Math.min(...yValues));
+                
+                if (i === 0) {
+                    ctx.moveTo(canvasX, canvasY);
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            });
+            ctx.stroke();
+        }
+
+        // 生成所有图表
+        function generateAllCharts() {
+            // 清除加载提示
+            document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
+            
+            // 生成图表
+            setTimeout(() => createChart1(), 100);
+            setTimeout(() => createChart2(), 200);
+            setTimeout(() => createChart3(), 300);
+            setTimeout(() => createChart4(), 400);
+            setTimeout(() => createChart5(), 500);
+        }
+
+        // 滚动到顶部
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 绘制通用图表辅助函数
+        function drawCoordinateSystem(ctx, width, height, padding, title) {
+            // 绘制背景
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 绘制标题
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            // 绘制坐标系
+            ctx.strokeStyle = colorScheme.accent;
+            ctx.lineWidth = 1;
+            
+            // X轴
+            ctx.beginPath();
+            ctx.moveTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.stroke();
+            
+            // Y轴
+            ctx.beginPath();
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.stroke();
+            
+            // 网格线
+            ctx.strokeStyle = '#f0f0f0';
+            for (let i = 0; i <= 10; i++) {
+                const x = padding + (width - 2 * padding) * i / 10;
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, height - padding);
+                ctx.stroke();
+                
+                const y = padding + (height - 2 * padding) * i / 10;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(width - padding, y);
+                ctx.stroke();
+            }
+        }
+        
+        // 练习1：股票价格图（粉紫色调）
+        function createChart1() {
+            const canvas = document.getElementById('chart1');
+            const ctx = canvas.getContext('2d');
+            
+            // 数据
+            const prices = [100.0, 100.2, 101.0, 100.5, 100.8, 102.0, 101.5, 101.8,
+                          101.3, 100.9, 100.0, 99.5, 100.0, 99.8, 100.5, 101.2, 
+                          101.0, 101.5, 102.5, 103.0, 102.8, 102.5, 102.0, 101.5, 101.8];
+            
+            drawCoordinateSystem(ctx, canvas.width, canvas.height, 60, '股票价格走势图');
+            
+            // 绘制数据线（粉紫色）
+            ctx.strokeStyle = colorScheme.primary;
+            ctx.fillStyle = colorScheme.primary;
+            ctx.lineWidth = 3;
+            
+            const chartWidth = canvas.width - 120;
+            const chartHeight = canvas.height - 120;
+            
+            ctx.beginPath();
+            prices.forEach((value, i) => {
+                const x = 60 + (chartWidth * i) / (prices.length - 1);
+                const y = canvas.height - 60 - (chartHeight * (value - Math.min(...prices))) / (Math.max(...prices) - Math.min(...prices));
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // 绘制数据点（粉紫色）
+            prices.forEach((value, i) => {
+                const x = 60 + (chartWidth * i) / (prices.length - 1);
+                const y = canvas.height - 60 - (chartHeight * (value - Math.min(...prices))) / (Math.max(...prices) - Math.min(...prices));
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // 添加轴标签
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('时间(小时)', canvas.width / 2, canvas.height - 20);
+            
+            ctx.save();
+            ctx.translate(20, canvas.height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('价格(元)', 0, 0);
+            ctx.restore();
+        }
+        
+        // 练习2：销量图（双线，粉紫色调）
+        function createChart2() {
+            const canvas = document.getElementById('chart2');
+            const ctx = canvas.getContext('2d');
+            
+            // 数据
+            const allSales = [50, 55, 60, 65, 75, 80, 85, 90, 80, 70, 65, 70];
+            const eastSales = [20, 22, 25, 28, 30, 35, 38, 40, 35, 30, 28, 30];
+            
+            drawCoordinateSystem(ctx, canvas.width, canvas.height, 60, '全国及华东区销量月度走势图');
+            
+            const chartWidth = canvas.width - 120;
+            const chartHeight = canvas.height - 120;
+            
+            // 绘制全国销量线（主紫色）
+            ctx.strokeStyle = colorScheme.primary;
+            ctx.fillStyle = colorScheme.primary;
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            allSales.forEach((value, i) => {
+                const x = 60 + (chartWidth * i) / (allSales.length - 1);
+                const y = canvas.height - 60 - (chartHeight * (value - Math.min(...allSales))) / (Math.max(...allSales) - Math.min(...allSales));
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // 绘制华东销量线（粉红色）
+            ctx.strokeStyle = colorScheme.secondary;
+            ctx.fillStyle = colorScheme.secondary;
+            
+            ctx.beginPath();
+            eastSales.forEach((value, i) => {
+                const x = 60 + (chartWidth * i) / (eastSales.length - 1);
+                const y = canvas.height - 60 - (chartHeight * (value - Math.min(...eastSales))) / (Math.max(...eastSales) - Math.min(...eastSales));
+                
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.stroke();
+            
+            // 绘制数据点
+            allSales.forEach((value, i) => {
+                const x = 60 + (chartWidth * i) / (allSales.length - 1);
+                const y = canvas.height - 60 - (chartHeight * (value - Math.min(...allSales))) / (Math.max(...allSales) - Math.min(...allSales));
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            eastSales.forEach((value, i) => {
+                const x = 60 + (chartWidth * i) / (eastSales.length - 1);
+                const y = canvas.height - 60 - (chartHeight * (value - Math.min(...eastSales))) / (Math.max(...eastSales) - Math.min(...eastSales));
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // 图例
+            ctx.fillStyle = colorScheme.primary;
+            ctx.fillRect(canvas.width - 120, 40, 20, 3);
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = '12px Arial';
+            ctx.fillText('全国总销量', canvas.width - 90, 45);
+            
+            ctx.fillStyle = colorScheme.secondary;
+            ctx.fillRect(canvas.width - 120, 60, 20, 3);
+            ctx.fillStyle = colorScheme.dark;
+            ctx.fillText('华东区销量', canvas.width - 90, 65);
+        }
+        
+        // 练习3：水平条形图（粉紫色调）
+        function createChart3() {
+            const canvas = document.getElementById('chart3');
+            const ctx = canvas.getContext('2d');
+            
+            // 数据
+            const languages = ['Python', 'JavaScript', 'Java', 'C#', 'Go', 'TypeScript'];
+            const votes = [450, 380, 290, 180, 120, 90];
+            
+            drawCoordinateSystem(ctx, canvas.width, canvas.height, 80, '编程语言投票结果条形图');
+            
+            const chartWidth = canvas.width - 160;
+            const chartHeight = canvas.height - 160;
+            const barHeight = chartHeight / languages.length * 0.8;
+            const barSpacing = chartHeight / languages.length * 0.2;
+            const maxValue = Math.max(...votes);
+            
+            languages.forEach((label, i) => {
+                const barWidth = (votes[i] / maxValue) * chartWidth;
+                const x = 80;
+                const y = 80 + i * (barHeight + barSpacing);
+                
+                // 绘制条形（渐变紫色）
+                const gradient = ctx.createLinearGradient(x, y, x + barWidth, y + barHeight);
+                gradient.addColorStop(0, colorScheme.light);
+                gradient.addColorStop(1, colorScheme.primary);
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // 绘制数值标签
+                ctx.fillStyle = colorScheme.dark;
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(votes[i].toString(), x + barWidth + 10, y + barHeight / 2 + 4);
+                
+                // 绘制语言标签
+                ctx.fillStyle = colorScheme.dark;
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(label, x - 10, y + barHeight / 2 + 4);
+            });
+        }
+        
+        // 练习4：二次函数（粉紫色调）
+        function createChart4() {
+            const canvas = document.getElementById('chart4');
+            const ctx = canvas.getContext('2d');
+            
+            // 生成函数数据
+            const xValues = [];
+            const yValues = [];
+            for (let i = -5; i <= 5; i += 0.1) {
+                xValues.push(i);
+                yValues.push(i * i);
+            }
+            
+            drawCoordinateSystem(ctx, canvas.width, canvas.height, 60, '二次函数 y = x² 图像');
+            
+            // 绘制函数曲线（粉红色）
+            ctx.strokeStyle = colorScheme.secondary;
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            xValues.forEach((x, i) => {
+                const canvasX = 60 + ((canvas.width - 120) * (x + 5)) / 10;
+                const canvasY = canvas.height - 60 - ((canvas.height - 120) * (yValues[i] - 0)) / 25;
+                
+                if (i === 0) {
+                    ctx.moveTo(canvasX, canvasY);
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            });
+            ctx.stroke();
+            
+            // 添加原点标记
+            ctx.fillStyle = colorScheme.primary;
+            ctx.beginPath();
+            ctx.arc(60 + ((canvas.width - 120) * 5) / 10, canvas.height - 60, 4, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+        
+        // 练习5：正切函数（粉紫色调）
+        function createChart5() {
+            const canvas = document.getElementById('chart5');
+            const ctx = canvas.getContext('2d');
+            
+            // 生成函数数据（避开奇点）
+            const xValues = [];
+            const yValues = [];
+            const pi = Math.PI;
+            for (let i = -pi + 0.1; i <= pi - 0.1; i += 0.05) {
+                if (Math.abs(i) !== pi/2 && Math.abs(Math.tan(i)) < 10) {
+                    xValues.push(i);
+                    yValues.push(Math.tan(i));
+                }
+            }
+            
+            drawCoordinateSystem(ctx, canvas.width, canvas.height, 60, '正切函数 y = tan(x) 图像');
+            
+            // 绘制函数曲线（主紫色）
+            ctx.strokeStyle = colorScheme.primary;
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            xValues.forEach((x, i) => {
+                const canvasX = 60 + ((canvas.width - 120) * (x + pi)) / (2 * pi);
+                const canvasY = canvas.height - 60 - ((canvas.height - 120) * (yValues[i] + 4)) / 8;
+                
+                if (i === 0) {
+                    ctx.moveTo(canvasX, canvasY);
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            });
+            ctx.stroke();
+            
+            // 添加数学符号标记
+            ctx.fillStyle = colorScheme.dark;
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            
+            // π标记
+            const piPositions = [-pi, -pi/2, 0, pi/2, pi];
+            piPositions.forEach(piValue => {
+                const canvasX = 60 + ((canvas.width - 120) * (piValue + pi)) / (2 * pi);
+                let label = '';
+                if (piValue === -pi) label = '-π';
+                else if (piValue === -pi/2) label = '-π/2';
+                else if (piValue === 0) label = '0';
+                else if (piValue === pi/2) label = 'π/2';
+                else if (piValue === pi) label = 'π';
+                
+                ctx.fillText(label, canvasX, canvas.height - 40);
+            });
+        }
+        
+        // 生成所有图表
+        function generateAllCharts() {
+            // 清除加载提示
+            document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
+            
+            // 生成图表
+            setTimeout(() => createChart1(), 100);
+            setTimeout(() => createChart2(), 200);
+            setTimeout(() => createChart3(), 300);
+            setTimeout(() => createChart4(), 400);
+            setTimeout(() => createChart5(), 500);
+        }
+        
+        // 滚动到顶部
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // 页面加载完成后生成图表
+        document.addEventListener('DOMContentLoaded', function() {
+            generateAllCharts();
+        });
+    </script>
+</body>
+</html>

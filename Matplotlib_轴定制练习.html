@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matplotlib 坐标轴定制练习</title>
+    <!-- 引入Plotly.js用于动态图表渲染 -->
+    <script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.24.1/plotly.min.js"></script>
+    <script>
+        // 备用方案：如果Plotly加载失败，使用本地Canvas绘制
+        window.onload = function() {
+            if (typeof Plotly === 'undefined') {
+                console.warn('Plotly加载失败，使用备用方案');
+                createFallbackCharts();
+            } else {
+                generateAllCharts();
+            }
+        };
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f8bbd9 0%, #e1bee7 50%, #ce93d8 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #d81b60 0%, #8e24aa 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(142, 36, 170, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header h2 {
+            font-size: 1.5em;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .exercise {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 15px;
+            border-left: 6px solid #d81b60;
+            box-shadow: 0 5px 20px rgba(142, 36, 170, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .exercise-title {
+            color: #8e24aa;
+            margin-top: 0;
+            font-size: 1.8em;
+            border-bottom: 2px solid #f8bbd9;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .task {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #e1bee7;
+        }
+        
+        .task h3 {
+            color: #d81b60;
+            margin-bottom: 15px;
+        }
+        
+        .requirements {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #d81b60;
+            margin: 15px 0;
+        }
+        
+        .requirements ul {
+            padding-left: 20px;
+        }
+        
+        .requirements li {
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+        
+        .data-section {
+            background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 100%);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #d81b60;
+            margin: 15px 0;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #e1bee7;
+        }
+        
+        .chart-title {
+            text-align: center;
+            color: #8e24aa;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .code {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid #d81b60;
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #f8bbd9 0%, #e1bee7 100%);
+            border-radius: 15px;
+            color: #7b1fa2;
+            box-shadow: 0 5px 20px rgba(142, 36, 170, 0.2);
+        }
+        
+        .loading {
+            text-align: center;
+            color: #8e24aa;
+            font-size: 1.1em;
+            margin: 20px 0;
+        }
+        
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60% { content: '...'; }
+            80%, 100% { content: ''; }
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        
+        .nav-button {
+            flex: 1;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #d81b60 0%, #8e24aa 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(142, 36, 170, 0.4);
+        }
+        
+        .exercise-number {
+            background: #d81b60;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>第6章: Matplotlib 坐标轴定制练习题</h1>
+        <h2>熟练掌握 Matplotlib 坐标轴定制核心技巧</h2>
+        <p>包括刻度控制、图内轴添加、轴脊调整，提升图表专业性</p>
+    </div>
+
+    <!-- 练习 1 -->
+    <div class="exercise" id="exercise1">
+        <div class="exercise-number">练习 1</div>
+        <h2 class="exercise-title">定制刻度位置、格式与样式</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>用给定的 48 小时股票价格数据，绘制折线图(样式 'g-o')，重点实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>X 轴主刻度每 12 小时、格式为 YYYY-MM-DD HH:MM</li>
+                    <li>X 轴次刻度每 2 小时</li>
+                    <li>主刻度朝外(蓝色、长10宽2、标签旋转15°)，次刻度朝内(红色、长5)</li>
+                    <li>添加网格线，设置合理标题和轴标签</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+base = datetime(2025, 1, 1, 0)
+x_time = np.array([base + timedelta(hours=i*2) for i in range(25)])
+y_price = np.array([100.0, 100.2, 101.0, 100.5, 100.8, 102.0, 101.5, 101.8,
+                  101.3, 100.9, 100.0, 99.5, 100.0, 99.8, 100.5, 101.2, 101.0, 101.5, 102.5,
+                  103.0, 102.8, 102.5, 102.0, 101.5, 101.8])
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">股票价格走势图</div>
+            <div class="loading">正在生成图表</div>
+            <div id="chart1" style="width: 100%; height: 400px;"></div>
+        </div>
+    </div>
+
+    <!-- 练习 2 -->
+    <div class="exercise" id="exercise2">
+        <div class="exercise-number">练习 2</div>
+        <h2 class="exercise-title">添加图内坐标轴</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>用"大图+小图"展示销量数据:</p>
+            <div class="requirements">
+                <ul>
+                    <li>大图(主坐标轴)展示全国总销量(样式 'b-s')</li>
+                    <li>小图(嵌入右上角)展示华东区销量(样式 'r-o')</li>
+                    <li>主坐标轴位置 [0.1, 0.1, 0.8, 0.8]，小图位置自己调节</li>
+                    <li>小图刻度标签缩小，避免拥挤(可取 labelsize=8)</li>
+                    <li>设置标题、轴标签和图例</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+x_all = np.arange(1, 13)
+y_all_sales = np.array([50, 55, 60, 65, 75, 80, 85, 90, 80, 70, 65, 70])
+y_east_sales = np.array([20, 22, 25, 28, 30, 35, 38, 40, 35, 30, 28, 30])
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">全国及华东区销量月度走势图</div>
+            <div class="loading">正在生成图表</div>
+            <div id="chart2" style="width: 100%; height: 500px;"></div>
+        </div>
+    </div>
+
+    <!-- 练习 3 -->
+    <div class="exercise" id="exercise3">
+        <div class="exercise-number">练习 3</div>
+        <h2 class="exercise-title">隐藏部分轴脊</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>用水平条形图展示编程语言投票数据，重点实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>隐藏顶部和右侧轴脊</li>
+                    <li>隐藏 Y 轴刻度线</li>
+                    <li>(选做)为条形图添加得票数值标签</li>
+                    <li>设置标题和轴标签，优化图表简洁度</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+languages = ['Python', 'JavaScript', 'Java', 'C#', 'Go', 'TypeScript']
+y_pos = np.arange(len(languages))
+votes = np.array([450, 380, 290, 180, 120, 90])
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">编程语言投票结果条形图</div>
+            <div class="loading">正在生成图表</div>
+            <div id="chart3" style="width: 100%; height: 400px;"></div>
+        </div>
+    </div>
+
+    <!-- 练习 4 -->
+    <div class="exercise" id="exercise4">
+        <div class="exercise-number">练习 4</div>
+        <h2 class="exercise-title">移动轴脊到数据中心</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>绘制二次函数 y = x²，重点实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>隐藏顶部和右侧轴脊</li>
+                    <li>将左右、底部轴脊移动到坐标原点 (0,0)</li>
+                    <li>设置合理坐标轴范围，添加图例和标题</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+x = np.linspace(-5, 5, 100)
+y = x**2
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">二次函数图像</div>
+            <div class="loading">正在生成图表</div>
+            <div id="chart4" style="width: 100%; height: 400px;"></div>
+        </div>
+    </div>
+
+    <!-- 练习 5 -->
+    <div class="exercise" id="exercise5">
+        <div class="exercise-number">练习 5</div>
+        <h2 class="exercise-title">综合定制(轴脊+刻度)</h2>
+        
+        <div class="task">
+            <h3>任务</h3>
+            <p>绘制正切函数 y = tan(x)，综合实现:</p>
+            <div class="requirements">
+                <ul>
+                    <li>隐藏顶部和右侧轴脊，移动轴脊到原点</li>
+                    <li>Y 轴范围限制为 [-4, 4](避开无穷大奇点)</li>
+                    <li>X 轴刻度设为 [-π, -π/2, 0, π/2, π]，标签用 LaTeX 格式</li>
+                    <li>添加网格线、图例和标题</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="data-section">
+            <h4>数据</h4>
+            <div class="code">
+x = np.linspace(-np.pi + 0.1, np.pi - 0.1, 200)
+y = np.tan(x)
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">正切函数图像</div>
+            <div class="loading">正在生成图表</div>
+            <div id="chart5" style="width: 100%; height: 400px;"></div>
+        </div>
+    </div>
+
+    <div class="nav-buttons">
+        <button class="nav-button" onclick="scrollToTop()">回到顶部</button>
+        <button class="nav-button" onclick="generateAllCharts()">重新生成所有图表</button>
+    </div>
+
+    <div class="instructions">
+        <h3>✨ 交互式图表展示</h3>
+        <p>所有图表都已直接嵌入网页中，支持缩放、平移等交互操作</p>
+        <p>点击"重新生成所有图表"可以刷新图表显示</p>
+    </div>
+
+    <script>
+        // 模拟数据生成函数
+        function generateExercise1() {
+            const dates = [];
+            const prices = [100.0, 100.2, 101.0, 100.5, 100.8, 102.0, 101.5, 101.8,
+                          101.3, 100.9, 100.0, 99.5, 100.0, 99.8, 100.5, 101.2, 
+                          101.0, 101.5, 102.5, 103.0, 102.8, 102.5, 102.0, 101.5, 101.8];
+            
+            // 生成时间序列
+            for (let i = 0; i < 25; i++) {
+                dates.push(`2025-01-${String(Math.floor(i/12) + 1).padStart(2, '0')} ${String((i*2) % 24).padStart(2, '0')}:00`);
+            }
+            
+            const trace = {
+                x: dates,
+                y: prices,
+                mode: 'lines+markers',
+                type: 'scatter',
+                line: { color: '#8e24aa', width: 2 },
+                marker: { 
+                    color: '#8e24aa',
+                    size: 6,
+                    symbol: 'circle'
+                },
+                name: '股票价格'
+            };
+            
+            const layout = {
+                title: '48小时股票价格走势',
+                xaxis: {
+                    title: '时间',
+                    tickangle: 15,
+                    tickfont: { color: 'blue', size: 10 },
+                    gridcolor: 'lightgray',
+                    gridwidth: 1
+                },
+                yaxis: {
+                    title: '股票价格（元）',
+                    gridcolor: 'lightgray',
+                    gridwidth: 1
+                },
+                plot_bgcolor: 'rgba(240,240,240,0.8)',
+                paper_bgcolor: 'rgba(255,255,255,0.9)',
+                showlegend: true
+            };
+            
+            Plotly.newPlot('chart1', [trace], layout, { displayModeBar: true });
+        }
+
+        function generateExercise2() {
+            const months = Array.from({length: 12}, (_, i) => i + 1);
+            const allSales = [50, 55, 60, 65, 75, 80, 85, 90, 80, 70, 65, 70];
+            const eastSales = [20, 22, 25, 28, 30, 35, 38, 40, 35, 30, 28, 30];
+            
+            const trace1 = {
+                x: months,
+                y: allSales,
+                mode: 'lines+markers',
+                type: 'scatter',
+                line: { color: 'blue', width: 2 },
+                marker: { 
+                    color: 'blue',
+                    size: 8,
+                    symbol: 'square'
+                },
+                name: '全国总销量'
+            };
+            
+            const trace2 = {
+                x: months,
+                y: eastSales,
+                mode: 'lines+markers',
+                type: 'scatter',
+                line: { color: 'red', width: 2 },
+                marker: { 
+                    color: 'red',
+                    size: 6,
+                    symbol: 'circle'
+                },
+                name: '华东区销量',
+                xaxis: 'x2',
+                yaxis: 'y2'
+            };
+            
+            const layout = {
+                title: '全国及华东区销量月度走势',
+                xaxis: {
+                    title: '月份',
+                    domain: [0.1, 0.9],
+                    range: [0.5, 12.5]
+                },
+                yaxis: {
+                    title: '销量（单位：万件）',
+                    domain: [0.1, 0.9],
+                    range: [40, 95]
+                },
+                xaxis2: {
+                    title: '月份',
+                    domain: [0.7, 0.95],
+                    range: [0.5, 12.5],
+                    tickfont: { size: 8 }
+                },
+                yaxis2: {
+                    title: '销量',
+                    domain: [0.7, 0.95],
+                    range: [18, 42],
+                    tickfont: { size: 8 }
+                },
+                plot_bgcolor: 'rgba(240,240,240,0.8)',
+                paper_bgcolor: 'rgba(255,255,255,0.9)',
+                showlegend: true,
+                legend: { x: 0.02, y: 0.98 }
+            };
+            
+            Plotly.newPlot('chart2', [trace1, trace2], layout, { displayModeBar: true });
+        }
+
+        function generateExercise3() {
+            const languages = ['Python', 'JavaScript', 'Java', 'C#', 'Go', 'TypeScript'];
+            const votes = [450, 380, 290, 180, 120, 90];
+            
+            const trace = {
+                x: votes,
+                y: languages,
+                type: 'bar',
+                orientation: 'h',
+                marker: {
+                    color: 'rgba(100, 149, 237, 0.7)',
+                    line: {
+                        color: 'rgba(100, 149, 237, 1.0)',
+                        width: 1
+                    }
+                },
+                text: votes.map(v => v.toString()),
+                textposition: 'outside'
+            };
+            
+            const layout = {
+                title: '编程语言受欢迎程度投票结果',
+                xaxis: {
+                    title: '得票数',
+                    showgrid: true,
+                    gridcolor: 'lightgray',
+                    zeroline: false
+                },
+                yaxis: {
+                    title: '编程语言',
+                    showticklabels: true,
+                    showline: false,
+                    ticks: ''
+                },
+                plot_bgcolor: 'rgba(240,240,240,0.8)',
+                paper_bgcolor: 'rgba(255,255,255,0.9)',
+                margin: { l: 120, r: 30, t: 60, b: 60 }
+            };
+            
+            Plotly.newPlot('chart3', [trace], layout, { displayModeBar: true });
+        }
+
+        function generateExercise4() {
+            const x = [];
+            const y = [];
+            for (let i = -5; i <= 5; i += 0.1) {
+                x.push(i);
+                y.push(i * i);
+            }
+            
+            const trace = {
+                x: x,
+                y: y,
+                mode: 'lines',
+                type: 'scatter',
+                line: { color: 'red', width: 3 },
+                name: 'y = x²'
+            };
+            
+            const layout = {
+                title: '二次函数 y = x² 图像',
+                xaxis: {
+                    title: 'x',
+                    range: [-5.5, 5.5],
+                    zeroline: true,
+                    zerolinecolor: 'black',
+                    zerolinewidth: 2
+                },
+                yaxis: {
+                    title: 'y',
+                    range: [-1, 26],
+                    zeroline: true,
+                    zerolinecolor: 'black',
+                    zerolinewidth: 2
+                },
+                plot_bgcolor: 'rgba(240,240,240,0.8)',
+                paper_bgcolor: 'rgba(255,255,255,0.9)',
+                showlegend: true
+            };
+            
+            Plotly.newPlot('chart4', [trace], layout, { displayModeBar: true });
+        }
+
+        function generateExercise5() {
+            const x = [];
+            const y = [];
+            const pi = Math.PI;
+            
+            // 避开奇点
+            for (let i = -pi + 0.1; i <= pi - 0.1; i += 0.05) {
+                if (Math.abs(i) !== pi/2) {
+                    x.push(i);
+                    y.push(Math.tan(i));
+                }
+            }
+            
+            const trace = {
+                x: x,
+                y: y,
+                mode: 'lines',
+                type: 'scatter',
+                line: { color: 'blue', width: 2 },
+                name: 'y = tan(x)'
+            };
+            
+            const layout = {
+                title: '正切函数 y = tan(x) 图像',
+                xaxis: {
+                    title: 'x',
+                    range: [-pi-0.2, pi+0.2],
+                    tickvals: [-pi, -pi/2, 0, pi/2, pi],
+                    ticktext: ['-π', '-π/2', '0', 'π/2', 'π'],
+                    zeroline: true,
+                    zerolinecolor: 'black',
+                    zerolinewidth: 2
+                },
+                yaxis: {
+                    title: 'y',
+                    range: [-4, 4],
+                    zeroline: true,
+                    zerolinecolor: 'black',
+                    zerolinewidth: 2
+                },
+                plot_bgcolor: 'rgba(240,240,240,0.8)',
+                paper_bgcolor: 'rgba(255,255,255,0.9)',
+                showlegend: true
+            };
+            
+            Plotly.newPlot('chart5', [trace], layout, { displayModeBar: true });
+        }
+
+        // 生成所有图表
+        function generateAllCharts() {
+            // 清除加载提示
+            document.querySelectorAll('.loading').forEach(el => el.style.display = 'none');
+            
+            // 生成图表
+            setTimeout(() => generateExercise1(), 100);
+            setTimeout(() => generateExercise2(), 300);
+            setTimeout(() => generateExercise3(), 500);
+            setTimeout(() => generateExercise4(), 700);
+            setTimeout(() => generateExercise5(), 900);
+        }
+
+        // 滚动到顶部
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 备用Canvas绘制函数
+        function createFallbackCharts() {
+            document.querySelectorAll('.loading').forEach(el => el.innerHTML = '使用Canvas绘制基础图表...');
+            
+            // 练习1：股票价格图
+            createLineChart('chart1', '股票价格走势图', [
+                {x: Array.from({length: 25}, (_, i) => i * 2), y: [100.0, 100.2, 101.0, 100.5, 100.8, 102.0, 101.5, 101.8, 101.3, 100.9, 100.0, 99.5, 100.0, 99.8, 100.5, 101.2, 101.0, 101.5, 102.5, 103.0, 102.8, 102.5, 102.0, 101.5, 101.8], color: 'green', label: '股票价格'}
+            ]);
+            
+            // 练习2：销量图
+            createLineChart('chart2', '全国及华东区销量月度走势图', [
+                {x: Array.from({length: 12}, (_, i) => i + 1), y: [50, 55, 60, 65, 75, 80, 85, 90, 80, 70, 65, 70], color: 'blue', label: '全国总销量'},
+                {x: Array.from({length: 12}, (_, i) => i + 1), y: [20, 22, 25, 28, 30, 35, 38, 40, 35, 30, 28, 30], color: 'red', label: '华东区销量'}
+            ]);
+            
+            // 练习3：条形图
+            createBarChart('chart3', '编程语言投票结果条形图', ['Python', 'JavaScript', 'Java', 'C#', 'Go', 'TypeScript'], [450, 380, 290, 180, 120, 90]);
+            
+            // 练习4：二次函数
+            createFunctionChart('chart4', '二次函数 y = x² 图像', (x) => x * x, -5, 5, 100, 'red');
+            
+            // 练习5：正切函数
+            createFunctionChart('chart5', '正切函数 y = tan(x) 图像', (x) => Math.tan(x), -Math.PI + 0.1, Math.PI - 0.1, 200, 'blue');
+        }
+        
+        function createLineChart(containerId, title, datasets) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            canvas.width = container.clientWidth;
+            canvas.height = 400;
+            container.innerHTML = '';
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 60;
+            
+            // 清空画布
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 绘制标题
+            ctx.fillStyle = '#8e24aa';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            // 绘制坐标系
+            ctx.strokeStyle = '#ccc';
+            ctx.lineWidth = 1;
+            
+            // 网格线
+            for (let i = 0; i <= 10; i++) {
+                const x = padding + (width - 2 * padding) * i / 10;
+                ctx.beginPath();
+                ctx.moveTo(x, padding);
+                ctx.lineTo(x, height - padding);
+                ctx.stroke();
+            }
+            
+            // 绘制数据线
+            datasets.forEach(dataset => {
+                const xValues = dataset.x;
+                const yValues = dataset.y;
+                const minX = Math.min(...xValues);
+                const maxX = Math.max(...xValues);
+                const minY = Math.min(...yValues);
+                const maxY = Math.max(...yValues);
+                
+                ctx.strokeStyle = dataset.color;
+                ctx.fillStyle = dataset.color;
+                ctx.lineWidth = 2;
+                
+                ctx.beginPath();
+                xValues.forEach((x, i) => {
+                    const canvasX = padding + (width - 2 * padding) * (x - minX) / (maxX - minX);
+                    const canvasY = height - padding - (height - 2 * padding) * (yValues[i] - minY) / (maxY - minY);
+                    
+                    if (i === 0) {
+                        ctx.moveTo(canvasX, canvasY);
+                    } else {
+                        ctx.lineTo(canvasX, canvasY);
+                    }
+                });
+                ctx.stroke();
+                
+                // 绘制点
+                xValues.forEach((x, i) => {
+                    const canvasX = padding + (width - 2 * padding) * (x - minX) / (maxX - minX);
+                    const canvasY = height - padding - (height - 2 * padding) * (yValues[i] - minY) / (maxY - minY);
+                    
+                    ctx.beginPath();
+                    ctx.arc(canvasX, canvasY, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+            });
+        }
+        
+        function createBarChart(containerId, title, labels, values) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            canvas.width = container.clientWidth;
+            canvas.height = 400;
+            container.innerHTML = '';
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 80;
+            
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 标题
+            ctx.fillStyle = '#8e24aa';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            const maxValue = Math.max(...values);
+            const barWidth = (width - 2 * padding) / labels.length * 0.8;
+            const barSpacing = (width - 2 * padding) / labels.length * 0.2;
+            
+            labels.forEach((label, i) => {
+                const barHeight = (values[i] / maxValue) * (height - 2 * padding - 40);
+                const x = padding + i * (barWidth + barSpacing);
+                const y = height - padding - barHeight;
+                
+                // 条形
+                ctx.fillStyle = 'rgba(100, 149, 237, 0.7)';
+                ctx.fillRect(x, y, barWidth, barHeight);
+                
+                // 数值标签
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(values[i], x + barWidth / 2, y - 5);
+                
+                // 标签
+                ctx.fillStyle = '#666';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(label, x + barWidth / 2, height - padding + 20);
+            });
+        }
+        
+        function createFunctionChart(containerId, title, func, startX, endX, points, color) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            canvas.width = container.clientWidth;
+            canvas.height = 400;
+            container.innerHTML = '';
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const padding = 60;
+            
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            
+            // 标题
+            ctx.fillStyle = '#8e24aa';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, width / 2, 30);
+            
+            // 生成函数数据
+            const xValues = [];
+            const yValues = [];
+            for (let i = 0; i < points; i++) {
+                const x = startX + (endX - startX) * i / points;
+                xValues.push(x);
+                yValues.push(func(x));
+            }
+            
+            // 过滤有效值
+            const validPoints = [];
+            xValues.forEach((x, i) => {
+                if (Math.abs(yValues[i]) < 100) { // 避免无穷大
+                    validPoints.push({x: x, y: yValues[i]});
+                }
+            });
+            
+            // 绘制函数曲线
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            validPoints.forEach((point, i) => {
+                const canvasX = padding + (width - 2 * padding) * (point.x - startX) / (endX - startX);
+                const minY = Math.min(...validPoints.map(p => p.y));
+                const maxY = Math.max(...validPoints.map(p => p.y));
+                const yRange = maxY - minY || 1;
+                const canvasY = height - padding - (height - 2 * padding) * (point.y - minY) / yRange;
+                
+                if (i === 0) {
+                    ctx.moveTo(canvasX, canvasY);
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            });
+            ctx.stroke();
+            
+            // 坐标轴
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(padding, height - padding);
+            ctx.lineTo(width - padding, height - padding);
+            ctx.moveTo(padding, padding);
+            ctx.lineTo(padding, height - padding);
+            ctx.stroke();
+        }
+        
+        // 页面加载完成后生成图表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟一点确保Plotly有足够时间加载
+            setTimeout(() => {
+                if (typeof Plotly !== 'undefined') {
+                    generateAllCharts();
+                } else {
+                    createFallbackCharts();
+                }
+            }, 1000);
+        });
+
+        // 添加平滑滚动效果
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
